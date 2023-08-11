@@ -1,0 +1,44 @@
+{
+  "name": "sails-boilerplate",
+  "private": true,
+  "version": "0.0.0",
+  "description": "a Sails application",
+  "keywords": [],
+  "dependencies": {
+    "@sailshq/lodash": "^3.10.4",
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "cross-env": "^7.0.3",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
+    "nodemailer": "^6.8.0",
+    "sails": "^1.4.2",
+    "sails-hook-orm": "^3.0.2",
+    "sails-hook-sockets": "^2.0.0",
+    "sails-mysql": "^1.0.1",
+    "sinon": "^15.0.1",
+    "skipper": "^0.8.7"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "5.16.0",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
+  },
+  "scripts": {
+    "start": "npm run local",
+    "test": "node ./node_modules/mocha/bin/mocha --timeout 0 tests/lifecycle.test.js tests/integration/**/*.test.js",
+    "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
+    "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
+    "dev": "cross-env NODE_ENV=dev nodemon app.js",
+    "local": "cross-env NODE_ENV=local LOG_QUERIES=true nodemon app.js",
+    "staging": "cross-env NODE_ENV=staging nodemon app.js",
+    "production": "cross-env NODE_ENV=production nodemon app.js"
+  },
+  "main": "app.js",
+  "license": "",
+  "engines": {
+    "node": "^14.15"
+  }
+}
