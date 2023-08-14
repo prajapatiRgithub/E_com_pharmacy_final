@@ -134,8 +134,8 @@ module.exports = {
             );
           } else {
             return res.ok(
-              undefined,
-              messages.ID_NOT_FOUND,
+              [],
+              messages.DATA_NOT_FOUND,
               response.RESPONSE_STATUS.error,
             );
           }

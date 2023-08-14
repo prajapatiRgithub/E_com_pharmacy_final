@@ -344,18 +344,21 @@ module.exports = {
         const userProfile = await findOne(role, { id });
 
         if (userProfile && Object.keys(userProfile).length > 0) {
-          const countryData = await findOne('Country', {
-            id: userProfile.country_id,
-          });
-          const stateData = await findOne('State', {
-            id: userProfile.state_id,
-          });
-          const cityData = await findOne('City', { id: userProfile.city_id });
 
-          userProfile.country_id = countryData.country_name;
-          userProfile.state_id = stateData.state_name;
-          userProfile.city_id = cityData.city_name;
-
+          if (userProfile.country_id || userProfile.state_id || userProfile.city_id) {
+            const countryData = await findOne('Country', {
+              id: userProfile.country_id,
+            });
+            const stateData = await findOne('State', {
+              id: userProfile.state_id,
+            });
+            const cityData = await findOne('City', { id: userProfile.city_id });
+  
+            userProfile.country_id = countryData.country_name;
+            userProfile.state_id = stateData.state_name;
+            userProfile.city_id = cityData.city_name;
+          }
+        
           return res.ok(
             userProfile,
             messages.PROFILE_SUCCESS,
