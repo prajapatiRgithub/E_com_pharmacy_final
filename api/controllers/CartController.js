@@ -136,7 +136,7 @@ module.exports = {
             return res.ok(
               [],
               messages.DATA_NOT_FOUND,
-              response.RESPONSE_STATUS.error,
+              response.RESPONSE_STATUS.success,
             );
           }
         });

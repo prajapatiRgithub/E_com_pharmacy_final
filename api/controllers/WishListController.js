@@ -56,7 +56,7 @@ module.exports = {
         req.params
       );
       if (!isValidation.error) {
-        let sql = `SELECT w.is_archived, w.id ,p.id as product_id, p.is_prescription, p.name, p.price, p.description, pi.image FROM wishlist w INNER JOIN product p ON w.product_id = p.id INNER JOIN product_image pi ON p.id = pi.product_id WHERE w.user_id = ${req.params.user_id} GROUP BY pi.product_id`;
+        let sql = `SELECT w.is_archived, w.id ,p.id as product_id, p.is_prescription, p.name, p.price, p.description, pi.image, category.id as categoryId, category.name as categoryName FROM wishlist w INNER JOIN product p ON w.product_id = p.id INNER JOIN product_image pi ON p.id = pi.product_id INNER JOIN category ON category.id = p.category_id WHERE w.user_id = ${req.params.user_id} GROUP BY pi.product_id`;
 
         Wishlist.query(sql, (err, rawResult) => {
           if (err) {
@@ -76,7 +76,9 @@ module.exports = {
               description  : item.description,
               image        : item.image,
               isArchived   : item.is_archived,
-              prescription : item.is_prescription
+              prescription : item.is_prescription,
+              category_id  : item.categoryId,
+              categoryName : item.categoryName
             };
           });
 
@@ -88,9 +90,9 @@ module.exports = {
             );
           } else {
             return res.ok(
-              undefined,
-              messages.ID_NOT_FOUND,
-              response.RESPONSE_STATUS.error
+              [],
+              messages.DATA_NOT_FOUND,
+              response.RESPONSE_STATUS.success
             );
           }
         });
