@@ -114,7 +114,7 @@ module.exports = {
     groupBy
    ) => {
     try {
-      const { startDate, endDate, status, sort, limit, customerName, orderStatus } = body;
+      const { startDate, endDate, status, sort, limit, customerName, orderStatus, productName } = body;
       if ( startDate ) {
         sql += " AND " + date + " >='" + startDate + "'";
       }
@@ -131,8 +131,12 @@ module.exports = {
         sql += " AND " + statusOfOrder + " = '"+orderStatus+"'";
       }
 
-      if ( status ) {
-        sql += " AND " + prescription + " = " + status + "";
+      if ( status === true || status === false) {
+        sql += " AND " + prescription + " =  '" + status + "'";
+      }
+
+      if ( productName ) {
+        sql += " AND " + name + " = '" +productName+ "'";
       }
 
       if (groupBy) {

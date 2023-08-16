@@ -135,7 +135,13 @@ module.exports = {
     }),
     status: Joi.boolean().optional().allow('').messages({
       'boolean.base' : `Status should be a type of boolean`
-    }),    
+    }),
+    productName: Joi.string().optional().allow('').messages({
+      'string.base'  : `Name should be a type of text`,
+    }),
+    is_prescription: Joi.boolean().optional().allow('').messages({
+      'boolean.base'  : `Is prescription should be a type of boolean`,
+    }),
   }), 
 
   productImage: Joi.object().keys({ 

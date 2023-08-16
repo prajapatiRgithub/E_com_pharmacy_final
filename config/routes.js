@@ -69,6 +69,7 @@
   'GET /api/product/viewProduct/:product_id'      : 'ProductController.viewProduct',
   'POST /api/product/listOfProducts'              : 'ProductController.listOfProducts',
   'PUT /api/product/deleteMultipleProduct'        : 'ProductController.deleteMultipleProduct',
+  'POST /api/product/searchProduct'               : 'ProductController.searchProduct',
   //Search
   'GET /api/search/recentlySearch'                : 'SearchController.recentlySearch',
   'POST /api/search/addSearch'                    : 'SearchController.addSearch',
