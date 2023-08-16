@@ -291,7 +291,7 @@ module.exports = {
       );
       if (!isValidation.error) {
         Order.query(
-          'SELECT GROUP_CONCAT(product_image.image) as image,product.id, product.vendor_id, product.category_id, category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, product_details.composition, product_details.composition, product_details.presentation, product_details.storage, product_details.indication, product_details.dose, product_details.shelf_life FROM product_image INNER JOIN product ON product_image.product_id = product.id INNER JOIN product_details ON product_details.product_id = product.id INNER JOIN category ON category.id = product.category_id where product_details.product_id = "' +
+          'SELECT GROUP_CONCAT(product_image.image) as image,product.id, product.is_prescription, product.vendor_id, product.category_id, category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, product_details.composition, product_details.composition, product_details.presentation, product_details.storage, product_details.indication, product_details.dose, product_details.shelf_life FROM product_image INNER JOIN product ON product_image.product_id = product.id INNER JOIN product_details ON product_details.product_id = product.id INNER JOIN category ON category.id = product.category_id where product_details.product_id = "' +
             req.params.product_id +
             '"',
          async (err, rawResult) => {
