@@ -320,6 +320,12 @@ module.exports = {
     country_id: Joi.number().optional().messages({
       'number.base'  : `Country id should be a type of number`,
     }),
+    address_line_1: Joi.string().optional().allow('').messages({
+      'string.base'  : `Address line 1 should be a type of text`,
+    }),
+    address_line_2: Joi.string().optional().allow('').messages({
+      'string.base'  : `Address line 2 should be a type of text`,
+    }),
     city_id: Joi.number().optional().messages({
       'number.base'  : `City id should be a type of number`,
     }),

@@ -58,10 +58,6 @@ module.exports = {
           data.city_id = city_id;
         }
 
-        // req.body.dob = req.body.dob ? req.body.dob : null;
-        
-        console.log("req.ov",req.body);
-
         let userData = await create(role, req.body);
 
         if (userData && Object.keys(userData).length > 0) {
@@ -345,7 +341,7 @@ module.exports = {
 
         if (userProfile && Object.keys(userProfile).length > 0) {
 
-          if (userProfile.country_id || userProfile.state_id || userProfile.city_id) {
+          if (userProfile.country_id && userProfile.state_id && userProfile.city_id) {
             const countryData = await findOne('Country', {
               id: userProfile.country_id,
             });
@@ -357,6 +353,10 @@ module.exports = {
             userProfile.country_id = countryData.country_name;
             userProfile.state_id = stateData.state_name;
             userProfile.city_id = cityData.city_name;
+          } else {
+            userProfile.country_id = null;
+            userProfile.state_id = null;
+            userProfile.city_id = null;
           }
         
           return res.ok(

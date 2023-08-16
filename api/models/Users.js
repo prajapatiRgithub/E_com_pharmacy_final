@@ -59,6 +59,14 @@ module.exports = {
       type     : 'string',
       required : false,
     },
+    address_line_1: {
+      type     : 'string',
+      allowNull: true,
+    },
+    address_line_2: {
+      type     : 'string',
+      allowNull: true,
+    },
     country_id: {
       model    : 'Country',
       through  : 'id',
@@ -74,9 +82,13 @@ module.exports = {
       through  : 'id',
       required : false,
     },
+    zip_code: {
+      type     : 'string',
+      allowNull: true,
+    },
     referral_code: {
       type     : 'string',
-      required : false,
+      allowNull: true,
     },
     created_at: {
       type       : 'string',
