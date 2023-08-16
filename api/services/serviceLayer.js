@@ -136,7 +136,8 @@ module.exports = {
       }
 
       if ( productName ) {
-        sql += " AND " + name + " = '" +productName+ "'";
+        let data = `${productName}%`
+        sql += " AND " + name + " LIKE  '" +data+ "'";
       }
 
       if (groupBy) {
