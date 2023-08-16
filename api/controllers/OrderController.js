@@ -367,9 +367,11 @@ module.exports = {
             addressData.state_id = stateData.state_name;
             addressData.city_id = cityData.city_name;
 
-            shippingData.country_id = countryData.country_name;
-            shippingData.state_id = stateData.state_name;
-            shippingData.city_id = cityData.city_name;
+            if(shippingData) {
+              shippingData.country_id = countryData.country_name;
+              shippingData.state_id = stateData.state_name;
+              shippingData.city_id = cityData.city_name;
+            }
           }
           
           const orderData = await findOne(
