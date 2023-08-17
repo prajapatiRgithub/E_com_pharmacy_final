@@ -131,8 +131,12 @@ module.exports = {
         sql += " AND " + statusOfOrder + " = '"+orderStatus+"'";
       }
 
-      if ( status === true || status === false) {
-        sql += " AND " + prescription + " =  '" + status + "'";
+      if ( status === true ) { 
+        sql += " AND " + prescription + " =  '"+ 1 + "'";
+      }
+
+      if (status === false ) { 
+        sql += " AND " + prescription + " =  '"+ 0 + "'";
       }
 
       if ( productName ) {
