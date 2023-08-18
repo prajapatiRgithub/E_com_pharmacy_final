@@ -12,13 +12,15 @@ module.exports = {
       const countOfCustomer = await countOne('Users');
       const activeCustomer = await countOne('Users', { is_archived: 0 });
       const activeCategories = await countOne('Category', { is_archived: 0 });
-      const countOfProduct = await countOne('Product');
+      const countOfProduct = await countOne('Product', { is_archived: 0 });
       const productWithOutPrescription = await countOne('Product', {
-        is_prescription: 0,
+        is_prescription: false,
+        is_archived: 0
       });
       const productWithPrescription = await countOne('Product', {
-        is_prescription: 1,
-      });
+        is_prescription: true,
+        is_archived: 0
+      },{ is_archived: 0 });
       const confirmedOrder = await countOne('Order', {
         status: response.OrderEnum.Confirmed,
       });
