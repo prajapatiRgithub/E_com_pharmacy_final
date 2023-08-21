@@ -2,11 +2,12 @@ module.exports = {
 // common message for all api.
   REQUEST_FAILURE             : 'Failed to',
   DATA_NOT_FOUND              : 'Data not found.',
-  ADD_DATA                    : 'added successfully',
-  DELETE_SUCCESS              : 'deleted successfully',
+  ADD_DATA                    : 'is added successfully',
+  DELETE_SUCCESS              : 'is deleted successfully',
   DATABASE_QUERY_ERROR        : 'Error in Database query usage',
   ID_NOT_FOUND                : 'Id not found',
   GET_SUCCESS                 : 'List of data successfully',
+  UPDATE_SUCCESS              : 'is updated successfully.',
   //Permission
   ADMIN_ACCESS_REQUIRED       : 'Valid access required',
   AUTH_TOKEN_MISSING          : 'Authorization header is missing',
@@ -36,7 +37,7 @@ module.exports = {
   VENDOR_ORDER_INVOICE        : 'Order invoice getting successfully',   
   //Banner
   SOMETHING_WENT_WRONG        : 'Something went wrong',
-  UPDATE_BANNER_SUCCESS       : 'Your banner is updated successfully.',
+  UPDATE_BANNER_SUCCESS       : 'Banner is updated successfully.',
   //category
   CATEGORY_SUCCESS            : 'Your category getting successfully',
   UPDATE_CATEGORY_SUCCESS     : 'Category is updated successfully.',

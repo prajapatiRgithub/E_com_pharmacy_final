@@ -165,7 +165,7 @@ module.exports = {
         if (cartData && cartData.length > 0) {
           return res.ok(
             undefined,
-            messages.UPDATE_CART_SUCCESS,
+            `Cart ${messages.UPDATE_SUCCESS}`,
             response.RESPONSE_STATUS.success,
           );
         } else {

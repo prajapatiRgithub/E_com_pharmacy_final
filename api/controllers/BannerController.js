@@ -114,7 +114,7 @@ module.exports = {
             if(responseData && responseData.length > 0){
               return res.ok(
                 undefined,
-                messages.UPDATE_BANNER_SUCCESS,
+                `Banner ${messages.UPDATE_SUCCESS}`,
                 response.RESPONSE_STATUS.success
               );
             }else{

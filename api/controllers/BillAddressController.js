@@ -130,7 +130,7 @@ module.exports = {
         if (editData && editData.length > 0) {
           return res.ok(
             undefined,
-            messages.UPDATE_ADDRESS,
+            `Address ${messages.UPDATE_SUCCESS}`,
             response.RESPONSE_STATUS.success
           );
         } else {
