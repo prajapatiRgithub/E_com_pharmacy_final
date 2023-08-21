@@ -12,15 +12,44 @@ module.exports = {
       const countOfCustomer = await countOne('Users');
       const activeCustomer = await countOne('Users', { is_archived: 0 });
       const activeCategories = await countOne('Category', { is_archived: 0 });
-      const countOfProduct = await countOne('Product', { is_archived: 0 });
-      const productWithOutPrescription = await countOne('Product', {
-        is_prescription: false,
-        is_archived: 0
+
+      let product = await findPopulate('Product_Image',undefined, ['product_id'])
+      //Count of products.
+      let uniqueProductIds = {};
+      let filteredArray = product.filter(item => {
+        if (!item.product_id.is_archived && !uniqueProductIds[item.product_id.id]) {
+          uniqueProductIds[item.product_id.id] = true;
+          return true;
+        }
+        return false;
       });
-      const productWithPrescription = await countOne('Product', {
-        is_prescription: true,
-        is_archived: 0
-      },{ is_archived: 0 });
+
+      const countOfProduct = filteredArray.length;
+      
+      //Count of with out prescription products.
+      let uniqueNotPrescription = {};
+      let withOutPrescription = product.filter(item => {
+        if (!item.product_id.is_archived && !item.product_id.is_prescription && !uniqueNotPrescription[item.product_id.id]) {
+          uniqueNotPrescription[item.product_id.id] = true;
+          return true;
+        }
+        return false;
+      });
+
+      const productWithOutPrescription = withOutPrescription.length;
+
+      //Count of prescription products.
+      let uniquePrescription = {};
+      let prescription = product.filter(item => {
+        if (!item.product_id.is_archived && item.product_id.is_prescription && !uniquePrescription[item.product_id.id]) {
+          uniquePrescription[item.product_id.id] = true;
+          return true;
+        }
+        return false;
+      });
+
+      const productWithPrescription = prescription.length;
+
       const confirmedOrder = await countOne('Order', {
         status: response.OrderEnum.Confirmed,
       });
