@@ -9,6 +9,7 @@ const {
   updateOne,
   reportService,
   findOne,
+  deleteOne
 } = require('../services/serviceLayer');
 const { verify } = require("../services/jwt");
 const categoryValidation = require('../validations/CategoryValidations');
@@ -34,6 +35,8 @@ module.exports = {
         indication,
         dose,
         shelf_life,
+        image,
+        selectedImage,
       } = req.body;
       const products = {
         is_prescription,
@@ -64,6 +67,20 @@ module.exports = {
           product_details.product_id = productData.id;
 
           await create("Product_Details", product_details);
+
+          if (image) {
+            for(let item of image) {
+              let obj = {product_id : productData.id};
+              if(item === selectedImage) {
+                obj.image = item;
+                obj.status = true;
+              } else{
+                obj.image = item;
+              }
+              await create("Product_Image", obj);
+            }
+          }
+         
           return res.ok(
             { id: productData.id },
             `Product ${messages.ADD_DATA}`,
@@ -112,6 +129,8 @@ module.exports = {
         indication,
         dose,
         shelf_life,
+        image,
+        selectedImage
       } = req.body;
       const products = {
         is_prescription,
@@ -149,6 +168,20 @@ module.exports = {
           { id: product_id },
           products
         );
+
+        if (image) {
+          for(let item of image) {
+            let obj = {product_id};
+            if(item === selectedImage) {
+              obj.image = item;
+              obj.status = true;
+            } else{
+              obj.image = item;
+            }
+            await create("Product_Image", obj);
+          }
+        }
+
         if (productData && productData.length > 0) {
           await updateOne("Product_Details", { product_id }, product_details);
           return res.ok(
@@ -211,70 +244,6 @@ module.exports = {
       return res.serverError(
         err,
         `${messages.REQUEST_FAILURE} delete Product.`,
-        response.RESPONSE_STATUS.error
-      );
-    }
-  },
-
-  productImage: async (req, res) => {
-    try {
-      const isValidation = productIdValidation.productIdValidation.validate(
-        req.body
-      );
-      if (!isValidation.error) {
-        req
-          .file("image")
-          .upload({ dirname: envVariables.path }, async (err, uploadFile) => {
-            let data = {};
-            if (err) {
-              return res.serverError(
-                err,
-                messages.SOMETHING_WENT_WRONG,
-                response.RESPONSE_STATUS.error
-              );
-            }
-            if (uploadFile && uploadFile.length === 0) {
-              return res.badRequest(
-                undefined,
-                messages.IMAGE_VALIDATIONS,
-                response.RESPONSE_STATUS.error
-              );
-            }
-            let filename = "";
-            if (uploadFile && uploadFile.length > 0) {
-              filename = uploadFile[0].fd.split("/").slice(-1)[0];
-            }
-
-            data.image = filename;
-            data.product_id = req.body.product_id;
-
-            const addImage = await create("Product_Image", data);
-
-            if (addImage && Object.keys(addImage).length > 0) {
-              return res.ok(
-                undefined,
-                `Image ${messages.ADD_DATA}`,
-                response.RESPONSE_STATUS.success
-              );
-            } else {
-              return res.notFound(
-                undefined,
-                messages.DATA_NOT_FOUND,
-                response.RESPONSE_STATUS.error
-              );
-            }
-          });
-      } else {
-        return res.badRequest(
-          isValidation.error,
-          undefined,
-          response.RESPONSE_STATUS.error
-        );
-      }
-    } catch (err) {
-      return res.serverError(
-        err,
-        `${messages.REQUEST_FAILURE} product image.`,
         response.RESPONSE_STATUS.error
       );
     }
@@ -361,7 +330,7 @@ module.exports = {
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
         let sql =
-          "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
+          "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false AND product_image.status = true ";
         const updatedSql = await reportService(
           sql,
           undefined,
@@ -601,6 +570,93 @@ module.exports = {
       return res.serverError(
         error,
         `${messages.REQUEST_FAILURE} view product.`,
+        response.RESPONSE_STATUS.error
+      );
+    }
+  },
+
+  uploadFile: async (req, res) => {
+    try {
+      const isValidation = productIdValidation.uploadFileValidation.validate(
+        req.body
+      );
+      if (!isValidation.error) {
+        req
+          .file("image")
+          .upload({ dirname: envVariables.path }, async (err, uploadFile) => {
+            if (err) {
+              return res.serverError(
+                err,
+                messages.SOMETHING_WENT_WRONG,
+                response.RESPONSE_STATUS.error
+              );
+            }
+            if (uploadFile && uploadFile.length === 0) {
+              return res.badRequest(
+                undefined,
+                messages.IMAGE_VALIDATIONS,
+                response.RESPONSE_STATUS.error
+              );
+            }
+
+            let images ;
+            if (uploadFile && uploadFile.length > 0) {
+              images = uploadFile.map((item) => {
+                let filename = item.fd.split("/").slice(-1)[0];
+                return filename
+              })
+            }
+              return res.ok(
+                images,
+                `Image ${messages.ADD_DATA}`,
+                response.RESPONSE_STATUS.success
+              );
+          });
+      } else {
+        return res.badRequest(
+          isValidation.error,
+          undefined,
+          response.RESPONSE_STATUS.error
+        );
+      }
+    } catch (err) {
+      return res.serverError(
+        err,
+        `${messages.REQUEST_FAILURE} product image.`,
+        response.RESPONSE_STATUS.error
+      );
+    }
+  },
+
+  deleteProductImage: async (req, res) => {
+    try {
+      const isValidation = productIdValidation.idValidation.validate(req.params);
+      if (!isValidation.error) {
+        const deleteProductImage = await deleteOne('Product_Image', req.params);
+        if (deleteProductImage && deleteProductImage.length > 0) {
+          return res.ok(
+            undefined,
+            `Product Image ${messages.DELETE_SUCCESS}`,
+            response.RESPONSE_STATUS.success
+          );
+        } else {
+          return res.ok(
+            undefined,
+            messages.ID_NOT_FOUND,
+            response.RESPONSE_STATUS.error
+          );
+        }
+      } else {
+        return res.badRequest(
+          isValidation.error,
+          undefined,
+          response.RESPONSE_STATUS.error
+        );
+      }
+    } catch (err) {
+      return res.serverError(
+        err,
+        `${messages.REQUEST_FAILURE} delete banner.`,
         response.RESPONSE_STATUS.error
       );
     }

@@ -27,6 +27,10 @@ module.exports = {
       type     : 'string',
       required : false,
     },
+    status: {
+      type       : 'boolean',
+      defaultsTo : false,
+    },
     created_at: {
       type       : 'string',
       columnType : 'date',

@@ -28,5 +28,8 @@ module.exports = {
       'number.empty'  : `Product id is not allowed to be empty`,
       'any.required'  : `Product id is Required`,
     }),
-  })
+  }),
+  uploadFileValidation: Joi.object().keys({
+    image: Joi.optional()
+  }),
 };

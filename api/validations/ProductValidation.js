@@ -70,6 +70,12 @@ module.exports = {
     shelf_life : Joi.string().optional().allow('').messages({
       'string.base' : `Shelf life should be a type of text`,
     }),
+    image : Joi.array().optional().messages({
+      'array.base'  : `image should be a type of array`,
+    }),
+    selectedImage : Joi.string().optional().allow('').messages({
+      'string.base' : `Shelf life should be a type of text`,
+    }),
   }),
 
   productEditValidate: Joi.object().keys({
@@ -122,6 +128,12 @@ module.exports = {
       'string.base' : `Dose should be a type of text`,
     }),
     shelf_life : Joi.string().optional().allow('').messages({
+      'string.base' : `Shelf life should be a type of text`,
+    }),
+    image : Joi.array().optional().allow('').messages({
+      'array.base'  : `image should be a type of array`,
+    }),
+    selectedImage : Joi.string().optional().allow('').messages({
       'string.base' : `Shelf life should be a type of text`,
     }),
   }),
