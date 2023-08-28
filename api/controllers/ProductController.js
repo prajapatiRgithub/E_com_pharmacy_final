@@ -69,19 +69,19 @@ module.exports = {
 
           await create("Product_Details", product_details);
 
-          if (image) {
-            for(let item of image) {
-              let obj = {product_id : productData.id};
-              if(item === selectedImage) {
+          if (image && selectedImage) {
+            for (let item of image) {
+              let obj = { product_id: productData.id };
+              if (item === selectedImage) {
                 obj.image = item;
                 obj.status = true;
-              } else{
+              } else {
                 obj.image = item;
               }
               await create("Product_Image", obj);
             }
           }
-         
+
           return res.ok(
             { id: productData.id },
             `Product ${messages.ADD_DATA}`,
@@ -131,7 +131,7 @@ module.exports = {
         dose,
         shelf_life,
         image,
-        selectedImage
+        selectedImage,
       } = req.body;
       const products = {
         is_prescription,
@@ -171,12 +171,12 @@ module.exports = {
         );
 
         if (image && selectedImage) {
-          for(let item of image) {
-            let obj = {product_id};
-            if(item === selectedImage) {
+          for (let item of image) {
+            let obj = { product_id };
+            if (item === selectedImage) {
               obj.image = item;
               obj.status = true;
-            } else{
+            } else {
               obj.image = item;
             }
             await create("Product_Image", obj);
@@ -184,15 +184,22 @@ module.exports = {
         }
 
         if (selectedImage) {
-          
-          const data = await findAll('Product_Image',{ product_id, status: true });
-
-          for (let key of data) {
-             if (selectedImage  !==  key.image) {
-              await updateOne("Product_Image", { id: key.id }, {status: false});
-             }
+          const data = await findAll("Product_Image", {
+            product_id,
+            status: true,
+          });
+          if (data.image !== selectedImage) {
+            await updateOne(
+              "Product_Image",
+              { id: data.id },
+              { status: false }
+            );
           }
-          await updateOne("Product_Details", { product_id }, product_details);
+          await updateOne(
+            "Product_Image",
+            { image: selectedImage },
+            { status: true }
+          );
         }
 
         if (productData && productData.length > 0) {
@@ -275,9 +282,36 @@ module.exports = {
       );
       if (!isValidation.error) {
         Order.query(
-          'SELECT GROUP_CONCAT(product_image.image) as image,product.id, product.is_prescription, product.vendor_id, product.category_id, category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, product_details.composition, product_details.composition, product_details.presentation, product_details.storage, product_details.indication, product_details.dose, product_details.shelf_life FROM product_image INNER JOIN product ON product_image.product_id = product.id INNER JOIN product_details ON product_details.product_id = product.id INNER JOIN category ON category.id = product.category_id where product_details.product_id = "' +
-            req.params.product_id +
-            '"',
+          `SELECT
+          product.id,
+          product.is_prescription,
+          product.vendor_id,
+          product.category_id,
+          category.name AS categoryName,
+          product.name,
+          product.description,
+          product.price,
+          product.quantity,
+          product.metaTagTitle,
+          product.metaTagDescription,
+          product.metaTagKeywords,
+          GROUP_CONCAT(
+              CONCAT(
+                  '{"id": "', product_image.id, '", "image": "', product_image.image, '", "status": "', product_image.status, '"}'
+              )
+              SEPARATOR ','
+          ) AS images
+      FROM
+          product
+      INNER JOIN
+          product_image ON product_image.product_id = product.id
+      INNER JOIN
+          category ON category.id = product.category_id
+      WHERE
+          product.id = ${req.params.product_id} 
+      GROUP BY
+          product.id;
+      `,
           async (err, rawResult) => {
             if (err) {
               return res.serverError(
@@ -301,6 +335,26 @@ module.exports = {
               } else {
                 rawResult.rows[0].flag = 0;
               }
+
+              let str = rawResult.rows[0].images;
+
+              const jsonStrings = str.split("},{");
+
+              const correctedJsonArray = jsonStrings.map((jsonStr, index) => {
+                if (index === 0) {
+                  return jsonStr + "}";
+                } else if (index === jsonStrings.length - 1) {
+                  return "{" + jsonStr;
+                } else {
+                  return "{" + jsonStr + "}";
+                }
+              });
+
+              const jsonArray = correctedJsonArray.map((jsonStr) =>
+                JSON.parse(jsonStr)
+              );
+
+              rawResult.rows[0].images = jsonArray;
 
               return res.ok(
                 rawResult.rows,
@@ -499,8 +553,6 @@ module.exports = {
           undefined,
           " GROUP BY product_image.product_id"
         );
-
-        console.log("updatedSql", updatedSql);
 
         Order.query(updatedSql, async (err, rawResult) => {
           if (err) {
