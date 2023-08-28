@@ -268,7 +268,8 @@ module.exports = {
         const orderHistory = await findAll(
           'Order',
           { user_id: req.params.user_id, is_archived:0 },
-          ['id', 'user_id', 'created_at', 'status', 'total_amount' , 'is_archived']
+          ['id', 'user_id', 'created_at', 'status', 'total_amount' , 'is_archived'],
+          'created_at DESC'
         );
 
         if (orderHistory && orderHistory.length > 0) {

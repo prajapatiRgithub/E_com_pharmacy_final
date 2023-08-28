@@ -9,7 +9,8 @@ const {
   updateOne,
   reportService,
   findOne,
-  deleteOne
+  deleteOne,
+  findAll
 } = require('../services/serviceLayer');
 const { verify } = require("../services/jwt");
 const categoryValidation = require('../validations/CategoryValidations');
@@ -169,7 +170,7 @@ module.exports = {
           products
         );
 
-        if (image) {
+        if (image && selectedImage) {
           for(let item of image) {
             let obj = {product_id};
             if(item === selectedImage) {
@@ -180,6 +181,18 @@ module.exports = {
             }
             await create("Product_Image", obj);
           }
+        }
+
+        if (selectedImage) {
+          
+          const data = await findAll('Product_Image',{ product_id, status: true });
+
+          for (let key of data) {
+             if (selectedImage  !==  key.image) {
+              await updateOne("Product_Image", { id: key.id }, {status: false});
+             }
+          }
+          await updateOne("Product_Details", { product_id }, product_details);
         }
 
         if (productData && productData.length > 0) {
