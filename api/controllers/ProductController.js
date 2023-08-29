@@ -322,7 +322,7 @@ module.exports = {
             }
             if (rawResult.rows && rawResult.rows.length > 0) {
               let id = 0;
-              if (decodedToken) {
+              if(decodedToken) {
                 id = decodedToken.id;
               }
 
@@ -336,23 +336,8 @@ module.exports = {
                 rawResult.rows[0].flag = 0;
               }
 
-              let str = rawResult.rows[0].images;
-
-              const jsonStrings = str.split("},{");
-
-              const correctedJsonArray = jsonStrings.map((jsonStr, index) => {
-                if (index === 0) {
-                  return jsonStr + "}";
-                } else if (index === jsonStrings.length - 1) {
-                  return "{" + jsonStr;
-                } else {
-                  return "{" + jsonStr + "}";
-                }
-              });
-
-              const jsonArray = correctedJsonArray.map((jsonStr) =>
-                JSON.parse(jsonStr)
-              );
+              str = "[" + rawResult.rows[0].images + "]";
+              const jsonArray = JSON.parse(str);
 
               rawResult.rows[0].images = jsonArray;
 
