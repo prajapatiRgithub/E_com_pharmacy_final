@@ -664,18 +664,18 @@ module.exports = {
               );
             }
 
-            let images ;
+            let images;
             if (uploadFile && uploadFile.length > 0) {
               images = uploadFile.map((item) => {
                 let filename = item.fd.split("/").slice(-1)[0];
-                return filename
-              })
+                return filename;
+              });
             }
-              return res.ok(
-                images,
-                `Image ${messages.ADD_DATA}`,
-                response.RESPONSE_STATUS.success
-              );
+            return res.ok(
+              images,
+              `Image ${messages.ADD_DATA}`,
+              response.RESPONSE_STATUS.success
+            );
           });
       } else {
         return res.badRequest(
@@ -695,9 +695,11 @@ module.exports = {
 
   deleteProductImage: async (req, res) => {
     try {
-      const isValidation = productIdValidation.idValidation.validate(req.params);
+      const isValidation = productIdValidation.idValidation.validate(
+        req.params
+      );
       if (!isValidation.error) {
-        const deleteProductImage = await deleteOne('Product_Image', req.params);
+        const deleteProductImage = await deleteOne("Product_Image", req.params);
         if (deleteProductImage && deleteProductImage.length > 0) {
           return res.ok(
             undefined,
@@ -722,6 +724,103 @@ module.exports = {
       return res.serverError(
         err,
         `${messages.REQUEST_FAILURE} delete banner.`,
+        response.RESPONSE_STATUS.error
+      );
+    }
+  },
+
+  productCount: async (req, res) => {
+    try {
+      let isRequest = productValidation.productImage.validate(req.body);
+
+      if (!isRequest.error) {
+        const { product_id } = req.body;
+        const findProduct = await findOne("Product", { id: product_id });
+
+        if (findProduct && Object.keys(findProduct).length > 0) {
+          const updatedCount = findProduct.productCount + 1;
+          const productData = await updateOne(
+            "Product",
+            { id: product_id },
+            { productCount: updatedCount }
+          );
+
+          if (productData && productData.length > 0) {
+            return res.ok(
+              { totalView: productData[0].productCount },
+              messages.COUNT_ADDED,
+              response.RESPONSE_STATUS.success
+            );
+          } else {
+            return res.notFound(
+              undefined,
+              messages.ID_NOT_FOUND,
+              response.RESPONSE_STATUS.error
+            );
+          }
+        } else {
+          return res.notFound(
+            undefined,
+            messages.ID_NOT_FOUND,
+            response.RESPONSE_STATUS.error
+          );
+        }
+      } else {
+        return res.badRequest(
+          isRequest.error,
+          undefined,
+          response.RESPONSE_STATUS.error
+        );
+      }
+    } catch (err) {
+      return res.serverError(
+        err,
+        `${messages.REQUEST_FAILURE} delete banner.`,
+        response.RESPONSE_STATUS.error
+      );
+    }
+  },
+
+  mostFrequentlyProducts: async (req, res) => {
+    try {
+      let isValidation = productValidation.listOfProduct.validate(req.body);
+      if (!isValidation.error) {
+        let sql =
+          "SELECT product.id as product_id, product.name, product.description, product.productCount FROM product_image INNER JOIN product ON product_image.product_id = product.id where product.is_archived = false GROUP BY product_image.product_id";
+
+        Order.query(sql, async (err, rawResult) => {
+          if (err) {
+            return res.serverError(
+              err,
+              messages.SOMETHING_WENT_WRONG,
+              response.RESPONSE_STATUS.error
+            );
+          }
+          if (rawResult.rows && rawResult.rows.length > 0) {
+            return res.ok(
+              rawResult.rows,
+              undefined,
+              response.RESPONSE_STATUS.success
+            );
+          } else {
+            return res.notFound(
+              undefined,
+              messages.DATA_NOT_FOUND,
+              response.RESPONSE_STATUS.error
+            );
+          }
+        });
+      } else {
+        return res.badRequest(
+          isValidation.error,
+          undefined,
+          response.RESPONSE_STATUS.error
+        );
+      }
+    } catch (error) {
+      return res.serverError(
+        error,
+        `${messages.REQUEST_FAILURE} view product.`,
         response.RESPONSE_STATUS.error
       );
     }

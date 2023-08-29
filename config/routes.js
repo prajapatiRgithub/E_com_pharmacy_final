@@ -71,6 +71,8 @@
   'PUT /api/product/deleteMultipleProduct'             : 'ProductController.deleteMultipleProduct',
   'POST /api/product/searchProduct'                    : 'ProductController.searchProduct',
   'DELETE /api/product/deleteProductImage/:id'         : 'ProductController.deleteProductImage',
+  'POST /api/product/productViewCount'                 : 'ProductController.productCount',
+  'GET /api/product/mostFrequentlyProducts'            : 'ProductController.mostFrequentlyProducts',
   //Search
   'GET /api/search/recentlySearch'                     : 'SearchController.recentlySearch',
   'POST /api/search/addSearch'                         : 'SearchController.addSearch',

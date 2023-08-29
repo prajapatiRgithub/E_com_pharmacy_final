@@ -73,6 +73,10 @@ module.exports = {
       type     : 'string',
       required : false
     },
+    productCount: {
+      type       : 'number',
+      defaultsTo : 0
+    },
     created_at: {
       type       : 'string',
       columnType : 'date',

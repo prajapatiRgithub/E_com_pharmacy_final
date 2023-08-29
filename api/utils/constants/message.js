@@ -8,6 +8,7 @@ module.exports = {
   ID_NOT_FOUND                : 'Id not found',
   GET_SUCCESS                 : 'List of data successfully',
   UPDATE_SUCCESS              : 'is updated successfully.',
+  COUNT_ADDED                 : 'Count ADDED',
   //Permission
   ADMIN_ACCESS_REQUIRED       : 'Valid access required',
   AUTH_TOKEN_MISSING          : 'Authorization header is missing',
