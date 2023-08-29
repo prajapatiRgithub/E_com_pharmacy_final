@@ -63,10 +63,11 @@ module.exports.policies = {
   },
 
   ProductController: {
-    addProduct     : ['isLoggedIn', 'commonAdministrator'],
-    editProduct    : ['isLoggedIn', 'commonAdministrator'],
-    deleteProduct  : ['isLoggedIn', 'commonAdministrator'],
-    productImage   : ['isLoggedIn', 'commonAdministrator'],
+    addProduct             : ['isLoggedIn', 'commonAdministrator'],
+    editProduct            : ['isLoggedIn', 'commonAdministrator'],
+    deleteProduct          : ['isLoggedIn', 'commonAdministrator'],
+    productImage           : ['isLoggedIn', 'commonAdministrator'],
+    mostFrequentlyProducts : ['isLoggedIn', 'commonAdministrator'],
   },
 
   SearchController: {
