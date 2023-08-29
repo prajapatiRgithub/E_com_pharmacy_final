@@ -139,11 +139,14 @@ module.exports = {
   }),
   
   listOfProduct: Joi.object().keys({
-    limit: Joi.number().optional().allow(null).messages({
-      'number.base'  : `Limit should be a type of number`,
+    pageNumber: Joi.number().optional().allow('',null).messages({
+      'number.base'  : `Page umber should be a type of number`,
     }),
-    sort: Joi.object().optional().min(1).allow(null).messages({
+    sort: Joi.object().optional().min(1).allow('',null).messages({
       'object.base'  : `Sort should be a type of object`,
+    }),
+    pageSize: Joi.number().optional().allow('',null).messages({
+      'number.base'  : `Page Size should be a type of number`,
     }),
     status: Joi.boolean().optional().allow('').messages({
       'boolean.base' : `Status should be a type of boolean`
