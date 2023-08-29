@@ -114,7 +114,7 @@ module.exports = {
     groupBy
    ) => {
     try {
-      const { startDate, endDate, status, sort, limit, customerName, orderStatus, productName } = body;
+      const { startDate, endDate, status, sort, customerName, orderStatus, productName } = body;
       if ( startDate ) {
         sql += " AND " + date + " >='" + startDate + "'";
       }
@@ -161,15 +161,23 @@ module.exports = {
           i++;
         }
       }
-
-      if ( limit ) {
-        sql += " LIMIT " + limit + " ";
-      }
-
       return sql;
     } catch (err) {
       throw err;
     }
+  },
+
+  generatePagination: async(sql, pageSize, pageNumber) => {
+    let offset = (pageNumber - 1 ) * pageSize;
+
+    if ( pageSize ) {
+      sql += " LIMIT " + pageSize + " ";
+    }
+
+    if ( pageNumber ) {
+      sql += " OFFSET " + offset ;
+    }
+    return sql;
   },
 
   createEach: async (collection, insertData) => {
