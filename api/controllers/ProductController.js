@@ -11,7 +11,8 @@ const {
   findOne,
   deleteOne,
   findAll,
-  generatePagination
+  generatePagination,
+  findPopulate
 } = require('../services/serviceLayer');
 const { verify } = require("../services/jwt");
 const categoryValidation = require('../validations/CategoryValidations');
@@ -462,9 +463,25 @@ module.exports = {
                 item.flag = 0;
               }
             }
+
+            let product = await findPopulate("Product_Image", undefined, [
+              "product_id",
+            ]);
+            let uniqueProductIds = {};
+            let filteredArray = product.filter((item) => {
+              if (
+                !item.product_id.is_archived &&
+                !uniqueProductIds[item.product_id.id]
+              ) {
+                uniqueProductIds[item.product_id.id] = true;
+                return true;
+              }
+              return false;
+            });
+
             let obj =  {
               item : result,
-              count : 14
+              count :  filteredArray.length
             }
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
