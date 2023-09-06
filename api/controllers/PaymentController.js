@@ -13,7 +13,9 @@ module.exports = {
         const paymentData = await create('Payment', req.body);
         if (paymentData && Object.keys(paymentData).length > 0) {
           return res.ok(
-            { order_id: paymentData.order_id },
+            { order_id: paymentData.order_id,
+            payment_id : paymentData.id
+            },
             `Payment ${messages.ADD_DATA}`,
             response.RESPONSE_STATUS.success
           );

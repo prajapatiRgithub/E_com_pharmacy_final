@@ -12,14 +12,20 @@ module.exports = {
       'number.empty'  : `Order id is not allowed to be empty`,
       'any.required'  : `Order id is Required`,
     }),
-    payment_type: Joi.number().empty().required().messages({
-      'number.base' : `Payment type should be a type of number`,
-      'number.empty': `Payment type cannot be an empty field`,
+    payment_type: Joi.string().required().empty().valid('Online', 'COD').messages({
+      'string.base' : `Payment type should be a type of text`,
+      'string.empty': `Payment type cannot be an empty field`,
+      'any.only'    : `Payment type must be a 'Online', 'COD'`,
       'any.required': `Payment type is Required`,
+    }),
+    transaction_id : Joi.string().required().empty().messages({
+      'string.base'  : `Transaction id should be a type of text`,
+      'string.empty' : `Transaction id cannot be an empty field`,
+      'any.required' : `Transaction id is Required`,
     }),
     payment_status: Joi.string().required().empty().valid('success', 'pending', 'failed').messages({
       'string.base' : `Payment status should be a type of text`,
-      'string.empty': `Payment status cannot be an name field`,
+      'string.empty': `Payment status cannot be an empty field`,
       'any.only'    : `Payment status must be a 'success', 'pending', 'failed'`,
       'any.required': `Payment status is Required`,
     }),

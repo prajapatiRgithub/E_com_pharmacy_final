@@ -35,7 +35,12 @@ module.exports = {
       required : true
     },
     payment_type: {
-      type     : 'number',
+      type       : 'string',
+      isIn       : ['Online', 'COD'],
+      required : true,
+    },
+    transaction_id: {
+      type     : 'string',
       required : true,
     },
     payment_status: {
