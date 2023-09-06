@@ -295,6 +295,12 @@ module.exports = {
           product.metaTagTitle,
           product.metaTagDescription,
           product.metaTagKeywords,
+          product_details.composition,
+          product_details.presentation,
+          product_details.storage,
+          product_details.indication,
+          product_details.dose,
+          product_details.shelf_life,
           GROUP_CONCAT(
               CONCAT(
                   '{"id": "', product_image.id, '", "image": "', product_image.image, '", "status": "', product_image.status, '"}'
@@ -307,6 +313,8 @@ module.exports = {
           product_image ON product_image.product_id = product.id
       INNER JOIN
           category ON category.id = product.category_id
+      INNER JOIN
+      product_details ON product_details.product_id = product.id
       WHERE
           product.id = ${req.params.product_id} 
       GROUP BY
@@ -314,6 +322,7 @@ module.exports = {
       `,
           async (err, rawResult) => {
             if (err) {
+              console.log("dfdfd",err);
               return res.serverError(
                 err,
                 messages.SOMETHING_WENT_WRONG,
