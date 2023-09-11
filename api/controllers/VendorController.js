@@ -95,7 +95,7 @@ module.exports = {
   orderList: async (req, res) => {
     try {
       Order.query(
-        'SELECT `order`.`id` as order_id, `order`.`status` ,`order`.`total_amount` as price ,users.first_name, users.last_name FROM `order` INNER JOIN users ON users.id = `order`.`user_id` where `order`.`is_archived` = false ',
+        'SELECT `order`.`id` as order_id, `order`.`status` ,`order`.`total_amount` as price ,users.first_name, users.last_name FROM `order` INNER JOIN users ON users.id = `order`.`user_id` where `order`.`is_archived` = false ORDER BY `order`.`created_at` DESC',
         async (err, rawResult) => {
           if (err) {
             return res.serverError(
