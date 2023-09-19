@@ -565,6 +565,7 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
+        let {pageNumber, pageSize} = req.body;
         let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
@@ -643,7 +644,27 @@ module.exports = {
                 item.flag = 0;
               }
             }
-            return res.ok(result, undefined, response.RESPONSE_STATUS.success);
+
+            let product = await findPopulate("Product_Image", undefined, [
+              "product_id",
+            ]);
+            let uniqueProductIds = {};
+            let filteredArray = product.filter((item) => {
+              if (
+                !item.product_id.is_archived &&
+                !uniqueProductIds[item.product_id.id]
+              ) {
+                uniqueProductIds[item.product_id.id] = true;
+                return true;
+              }
+              return false;
+            });
+
+            let obj =  {
+              item : result,
+              count :  filteredArray.length
+            }
+            return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
             return res.notFound(
               undefined,
