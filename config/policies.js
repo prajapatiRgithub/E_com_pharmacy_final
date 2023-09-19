@@ -117,7 +117,7 @@ module.exports.policies = {
     checkOut     : ['isLoggedIn', 'usersAdministrator'],
     cancelOrder  : ['isLoggedIn', 'usersAdministrator'],
     orderHistory : ['isLoggedIn', 'commonAdministrator'],
-    orderStatus  : ['isLoggedIn', 'usersAdministrator'],
+    orderStatus  : ['isLoggedIn', 'commonAdministrator'],
     viewOrder    : ['isLoggedIn', 'commonAdministrator'],
   }
 };

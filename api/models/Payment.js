@@ -32,16 +32,16 @@ module.exports = {
     order_id: {
       model    : 'Order',
       through  : 'id',
-      required : true
+      required : false
     },
     payment_type: {
       type       : 'string',
       isIn       : ['Online', 'COD'],
-      required : true,
+      required : false,
     },
     transaction_id: {
       type     : 'string',
-      required : true,
+      required : false,
     },
     payment_status: {
       type       : 'string',
