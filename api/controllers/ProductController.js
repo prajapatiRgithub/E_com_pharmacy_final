@@ -565,9 +565,10 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
+        let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
-        const updatedSql = await reportService(
+        updatedSql = await reportService(
           sql,
           undefined,
           "product.is_prescription",
@@ -576,6 +577,10 @@ module.exports = {
           undefined,
           " GROUP BY product_image.product_id"
         );
+
+        if (pageNumber && pageSize) {
+          updatedSql =await generatePagination(updatedSql, pageSize, pageNumber)
+        }
 
         Order.query(updatedSql, async (err, rawResult) => {
           if (err) {
