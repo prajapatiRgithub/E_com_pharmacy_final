@@ -568,7 +568,7 @@ module.exports = {
         let {pageNumber, pageSize} = req.body;
         let updatedSql;
         let sql =
-          "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
+          "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, COUNT(*) OVER () as product_count FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
         updatedSql = await reportService(
           sql,
           undefined,
@@ -633,6 +633,8 @@ module.exports = {
               id = decodedToken.id;
             }
 
+            let productCount ;
+
             for (let item of result) {
               const wishList = await findOne("Wishlist", {
                 and: [{ product_id: item.product_id, user_id: id }],
@@ -643,6 +645,10 @@ module.exports = {
               } else {
                 item.flag = 0;
               }
+
+              productCount = item?.product_count;
+
+              delete item.product_count;
             }
 
             let product = await findPopulate("Product_Image", undefined, [
@@ -661,8 +667,9 @@ module.exports = {
             });
 
             let obj =  {
+              totalProducts : productCount,  
               item : result,
-              count :  filteredArray.length
+              count :  filteredArray.length,
             }
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
