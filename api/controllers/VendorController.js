@@ -162,7 +162,7 @@ module.exports = {
       const isValidate = idValidation.orderIdValidation.validate(req.params);
       if (!isValidate.error) {
         Order.query(
-          'SELECT users.first_name,users.last_name,product.id,`order`.`address_id`, product.name,product.description,product.price,product_image.image,order_product.quantity,`order`.`user_id`,`order`.`tax` ,`order`.`created_at`, order_product.product_id,order_product.quantity FROM order_product INNER JOIN `order` ON `order`.`id` = order_product.order_id INNER JOIN users ON users.id = `order`.`user_id` INNER JOIN product ON product.id = order_product.product_id INNER JOIN bill_address ON bill_address.id = `order`.`address_id` INNER JOIN product_image ON product.id = product_image.product_id where `order`.`id` = "' +
+          'SELECT users.first_name,users.last_name,product.id,`order`.`address_id`, product.name,product.description,product.price,product_image.image,order_product.quantity,`order`.`user_id`,`order`.`tax` ,`order`.`created_at`,`order`.`status`, order_product.product_id,order_product.quantity FROM order_product INNER JOIN `order` ON `order`.`id` = order_product.order_id INNER JOIN users ON users.id = `order`.`user_id` INNER JOIN product ON product.id = order_product.product_id INNER JOIN bill_address ON bill_address.id = `order`.`address_id` INNER JOIN product_image ON product.id = product_image.product_id where `order`.`id` = "' +
             req.params.order_id +
             '" GROUP BY product.id',
           async (err, rawResult) => {
@@ -177,10 +177,13 @@ module.exports = {
             if (rawResult.rows && rawResult.rows.length > 0) {
               let values = [];
               let total = [];
+              let status ;
               for (let item of rawResult.rows) {
+                status =item.status;
                 item.subTotal = item.price * item.quantity;
                 total.push(item.subTotal);
                 values.push(item);
+                delete item.status;
               }
   
               let sum = 0;
@@ -199,7 +202,7 @@ module.exports = {
               address.city_id = cityData.city_name;
   
               values.push({ total_amount: sum });
-              let obj = { address: address, order: values };
+              let obj = { address: address, order: values , orderStatus: status};
   
               return res.ok(
                 obj,
