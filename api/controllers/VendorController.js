@@ -200,9 +200,7 @@ module.exports = {
               address.country_id = countryData.country_name;
               address.state_id = stateData.state_name;
               address.city_id = cityData.city_name;
-  
-              values.push({ total_amount: sum });
-              let obj = { address: address, order: values , orderStatus: status};
+              let obj = { address: address, order: values , orderStatus: status , total_amount: sum };
   
               return res.ok(
                 obj,
