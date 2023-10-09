@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-const productValidation = require('../validations/ProductValidation');
-const productIdValidation = require('../validations/IdValidation');
-const response = require('../utils/constants/enums');
-const messages = require('../utils/constants/message');
-const envVariables = require('../utils/constants/envVariables');
+const productValidation = require("../validations/ProductValidation");
+const productIdValidation = require("../validations/IdValidation");
+const response = require("../utils/constants/enums");
+const messages = require("../utils/constants/message");
+const envVariables = require("../utils/constants/envVariables");
 const {
   create,
   updateOne,
@@ -12,10 +12,10 @@ const {
   deleteOne,
   findAll,
   generatePagination,
-  findPopulate
-} = require('../services/serviceLayer');
+  findPopulate,
+} = require("../services/serviceLayer");
 const { verify } = require("../services/jwt");
-const categoryValidation = require('../validations/CategoryValidations');
+const categoryValidation = require("../validations/CategoryValidations");
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -190,13 +190,17 @@ module.exports = {
             product_id,
             status: true,
           });
+
           if (data.image !== selectedImage) {
-            await updateOne(
-              "Product_Image",
-              { id: data.id },
-              { status: false }
-            );
+            for (const record of data) {
+              await updateOne(
+                "Product_Image",
+                { id: record.id },
+                { status: false }
+              );
+            }
           }
+
           await updateOne(
             "Product_Image",
             { image: selectedImage },
@@ -324,7 +328,7 @@ module.exports = {
       `,
           async (err, rawResult) => {
             if (err) {
-              console.log("dfdfd",err);
+              console.log("dfdfd", err);
               return res.serverError(
                 err,
                 messages.SOMETHING_WENT_WRONG,
@@ -333,7 +337,7 @@ module.exports = {
             }
             if (rawResult.rows && rawResult.rows.length > 0) {
               let id = 0;
-              if(decodedToken) {
+              if (decodedToken) {
                 id = decodedToken.id;
               }
 
@@ -392,8 +396,7 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
-
-        let {pageNumber, pageSize} = req.body;
+        let { pageNumber, pageSize } = req.body;
         let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false AND product_image.status = true ";
@@ -408,7 +411,11 @@ module.exports = {
         );
 
         if (pageNumber && pageSize) {
-          updatedSql =await generatePagination(updatedSql, pageSize, pageNumber)
+          updatedSql = await generatePagination(
+            updatedSql,
+            pageSize,
+            pageNumber
+          );
         }
 
         Order.query(updatedSql, async (err, rawResult) => {
@@ -488,10 +495,10 @@ module.exports = {
               return false;
             });
 
-            let obj =  {
-              item : result,
-              count :  filteredArray.length
-            }
+            let obj = {
+              item: result,
+              count: filteredArray.length,
+            };
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
             return res.notFound(
@@ -565,7 +572,7 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
-        let {pageNumber, pageSize} = req.body;
+        let { pageNumber, pageSize } = req.body;
         let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, COUNT(*) OVER () as product_count FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
@@ -580,7 +587,11 @@ module.exports = {
         );
 
         if (pageNumber && pageSize) {
-          updatedSql =await generatePagination(updatedSql, pageSize, pageNumber)
+          updatedSql = await generatePagination(
+            updatedSql,
+            pageSize,
+            pageNumber
+          );
         }
 
         Order.query(updatedSql, async (err, rawResult) => {
@@ -633,7 +644,7 @@ module.exports = {
               id = decodedToken.id;
             }
 
-            let productCount ;
+            let productCount;
 
             for (let item of result) {
               const wishList = await findOne("Wishlist", {
@@ -666,11 +677,11 @@ module.exports = {
               return false;
             });
 
-            let obj =  {
-              totalProducts : productCount,  
-              item : result,
-              count :  filteredArray.length,
-            }
+            let obj = {
+              totalProducts: productCount,
+              item: result,
+              count: filteredArray.length,
+            };
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
             return res.notFound(
