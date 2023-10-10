@@ -175,7 +175,14 @@ module.exports = {
         if (image && selectedImage) {
           for (let item of image) {
             let obj = { product_id };
+            
             if (item === selectedImage) {
+              await updateOne(
+                "Product_Image",
+                { product_id },
+                { status: false }
+              );
+
               obj.image = item;
               obj.status = true;
             } else {
@@ -183,9 +190,7 @@ module.exports = {
             }
             await create("Product_Image", obj);
           }
-        }
-
-        if (selectedImage) {
+        } else if (selectedImage) {
           const data = await findAll("Product_Image", {
             product_id,
             status: true,
@@ -206,6 +211,12 @@ module.exports = {
             { image: selectedImage },
             { status: true }
           );
+        } else if (image) {
+          for (let item of image) {
+            let obj = { product_id };
+            obj.image = item;
+            await create("Product_Image", obj);
+          }
         }
 
         if (productData && productData.length > 0) {
@@ -328,7 +339,6 @@ module.exports = {
       `,
           async (err, rawResult) => {
             if (err) {
-              console.log("dfdfd", err);
               return res.serverError(
                 err,
                 messages.SOMETHING_WENT_WRONG,
