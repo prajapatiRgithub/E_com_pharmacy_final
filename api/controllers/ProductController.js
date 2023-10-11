@@ -12,9 +12,9 @@ const {
   deleteOne,
   findAll,
   generatePagination,
-  findPopulate
+  findPopulate,
 } = require('../services/serviceLayer');
-const { verify } = require("../services/jwt");
+const { verify } = require('../services/jwt');
 const categoryValidation = require('../validations/CategoryValidations');
 
 module.exports = {
@@ -65,11 +65,11 @@ module.exports = {
 
       const isValidate = productValidation.productValidate.validate(req.body);
       if (!isValidate.error) {
-        const productData = await create("Product", products);
+        const productData = await create('Product', products);
         if (productData && Object.keys(productData).length > 0) {
           product_details.product_id = productData.id;
 
-          await create("Product_Details", product_details);
+          await create('Product_Details', product_details);
 
           if (image && selectedImage) {
             for (let item of image) {
@@ -80,7 +80,7 @@ module.exports = {
               } else {
                 obj.image = item;
               }
-              await create("Product_Image", obj);
+              await create('Product_Image', obj);
             }
           }
 
@@ -167,7 +167,7 @@ module.exports = {
 
       if (!idValidate.error && !isValidate.error) {
         const productData = await updateOne(
-          "Product",
+          'Product',
           { id: product_id },
           products
         );
@@ -175,37 +175,52 @@ module.exports = {
         if (image && selectedImage) {
           for (let item of image) {
             let obj = { product_id };
+            
             if (item === selectedImage) {
+              await updateOne(
+                'Product_Image',
+                { product_id },
+                { status: false }
+              );
+
               obj.image = item;
               obj.status = true;
             } else {
               obj.image = item;
             }
-            await create("Product_Image", obj);
+            await create('Product_Image', obj);
           }
-        }
-
-        if (selectedImage) {
-          const data = await findAll("Product_Image", {
+        } else if (selectedImage) {
+          const data = await findAll('Product_Image', {
             product_id,
             status: true,
           });
+
           if (data.image !== selectedImage) {
-            await updateOne(
-              "Product_Image",
-              { id: data.id },
-              { status: false }
-            );
+            for (const record of data) {
+              await updateOne(
+                'Product_Image',
+                { id: record.id },
+                { status: false }
+              );
+            }
           }
+
           await updateOne(
-            "Product_Image",
+            'Product_Image',
             { image: selectedImage },
             { status: true }
           );
+        } else if (image) {
+          for (let item of image) {
+            let obj = { product_id };
+            obj.image = item;
+            await create('Product_Image', obj);
+          }
         }
 
         if (productData && productData.length > 0) {
-          await updateOne("Product_Details", { product_id }, product_details);
+          await updateOne('Product_Details', { product_id }, product_details);
           return res.ok(
             undefined,
             messages.UPDATE_PRODUCT_SUCCESS,
@@ -241,7 +256,7 @@ module.exports = {
         req.body
       );
       if (!idValidate.error && !isValidate.error) {
-        const data = await updateOne("Product", req.params, req.body);
+        const data = await updateOne('Product', req.params, req.body);
         if (data && data.length > 0) {
           return res.ok(
             undefined,
@@ -324,7 +339,6 @@ module.exports = {
       `,
           async (err, rawResult) => {
             if (err) {
-              console.log("dfdfd",err);
               return res.serverError(
                 err,
                 messages.SOMETHING_WENT_WRONG,
@@ -333,11 +347,11 @@ module.exports = {
             }
             if (rawResult.rows && rawResult.rows.length > 0) {
               let id = 0;
-              if(decodedToken) {
+              if (decodedToken) {
                 id = decodedToken.id;
               }
 
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: req.params.product_id, user_id: id }],
               });
 
@@ -392,8 +406,7 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
-
-        let {pageNumber, pageSize} = req.body;
+        let { pageNumber, pageSize } = req.body;
         let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false AND product_image.status = true ";
@@ -408,7 +421,11 @@ module.exports = {
         );
 
         if (pageNumber && pageSize) {
-          updatedSql =await generatePagination(updatedSql, pageSize, pageNumber)
+          updatedSql = await generatePagination(
+            updatedSql,
+            pageSize,
+            pageNumber
+          );
         }
 
         Order.query(updatedSql, async (err, rawResult) => {
@@ -423,7 +440,7 @@ module.exports = {
             let productDetails = [];
 
             for (let item of rawResult.rows) {
-              const productData = await findOne("Product_Details", {
+              const productData = await findOne('Product_Details', {
                 product_id: item.product_id,
               });
               if (productData && Object.keys(productData).length > 0) {
@@ -462,7 +479,7 @@ module.exports = {
             }
 
             for (let item of result) {
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: item.product_id, user_id: id }],
               });
 
@@ -473,8 +490,8 @@ module.exports = {
               }
             }
 
-            let product = await findPopulate("Product_Image", undefined, [
-              "product_id",
+            let product = await findPopulate('Product_Image', undefined, [
+              'product_id',
             ]);
             let uniqueProductIds = {};
             let filteredArray = product.filter((item) => {
@@ -488,10 +505,10 @@ module.exports = {
               return false;
             });
 
-            let obj =  {
-              item : result,
-              count :  filteredArray.length
-            }
+            let obj = {
+              item: result,
+              count: filteredArray.length,
+            };
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
             return res.notFound(
@@ -565,7 +582,7 @@ module.exports = {
 
       let isValidation = productValidation.listOfProduct.validate(req.body);
       if (!isValidation.error) {
-        let {pageNumber, pageSize} = req.body;
+        let { pageNumber, pageSize } = req.body;
         let updatedSql;
         let sql =
           "SELECT product_image.image as image, product.is_archived, product.is_prescription, product.id as product_id, product.vendor_id, product.category_id,  category.name as categoryName, product.name, product.description, product.price, product.quantity,product.metaTagTitle, product.metaTagDescription, product.metaTagKeywords, COUNT(*) OVER () as product_count FROM product_image INNER JOIN product ON product_image.product_id = product.id LEFT OUTER JOIN category ON category.id = product.category_id where product.is_archived = false ";
@@ -580,7 +597,11 @@ module.exports = {
         );
 
         if (pageNumber && pageSize) {
-          updatedSql =await generatePagination(updatedSql, pageSize, pageNumber)
+          updatedSql = await generatePagination(
+            updatedSql,
+            pageSize,
+            pageNumber
+          );
         }
 
         Order.query(updatedSql, async (err, rawResult) => {
@@ -595,7 +616,7 @@ module.exports = {
             let productDetails = [];
 
             for (let item of rawResult.rows) {
-              const productData = await findOne("Product_Details", {
+              const productData = await findOne('Product_Details', {
                 product_id: item.product_id,
               });
               if (productData && Object.keys(productData).length > 0) {
@@ -633,10 +654,10 @@ module.exports = {
               id = decodedToken.id;
             }
 
-            let productCount ;
+            let productCount;
 
             for (let item of result) {
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: item.product_id, user_id: id }],
               });
 
@@ -651,8 +672,8 @@ module.exports = {
               delete item.product_count;
             }
 
-            let product = await findPopulate("Product_Image", undefined, [
-              "product_id",
+            let product = await findPopulate('Product_Image', undefined, [
+              'product_id',
             ]);
             let uniqueProductIds = {};
             let filteredArray = product.filter((item) => {
@@ -666,11 +687,11 @@ module.exports = {
               return false;
             });
 
-            let obj =  {
-              totalProducts : productCount,  
-              item : result,
-              count :  filteredArray.length,
-            }
+            let obj = {
+              totalProducts: productCount,
+              item: result,
+              count: filteredArray.length,
+            };
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
           } else {
             return res.notFound(
@@ -703,7 +724,7 @@ module.exports = {
       );
       if (!isValidation.error) {
         req
-          .file("image")
+          .file('image')
           .upload({ dirname: envVariables.path }, async (err, uploadFile) => {
             if (err) {
               return res.serverError(
@@ -755,7 +776,7 @@ module.exports = {
         req.params
       );
       if (!isValidation.error) {
-        const deleteProductImage = await deleteOne("Product_Image", req.params);
+        const deleteProductImage = await deleteOne('Product_Image', req.params);
         if (deleteProductImage && deleteProductImage.length > 0) {
           return res.ok(
             undefined,
@@ -791,12 +812,12 @@ module.exports = {
 
       if (!isRequest.error) {
         const { product_id } = req.body;
-        const findProduct = await findOne("Product", { id: product_id });
+        const findProduct = await findOne('Product', { id: product_id });
 
         if (findProduct && Object.keys(findProduct).length > 0) {
           const updatedCount = findProduct.productCount + 1;
           const productData = await updateOne(
-            "Product",
+            'Product',
             { id: product_id },
             { productCount: updatedCount }
           );
