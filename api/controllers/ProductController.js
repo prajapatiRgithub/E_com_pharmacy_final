@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-const productValidation = require("../validations/ProductValidation");
-const productIdValidation = require("../validations/IdValidation");
-const response = require("../utils/constants/enums");
-const messages = require("../utils/constants/message");
-const envVariables = require("../utils/constants/envVariables");
+const productValidation = require('../validations/ProductValidation');
+const productIdValidation = require('../validations/IdValidation');
+const response = require('../utils/constants/enums');
+const messages = require('../utils/constants/message');
+const envVariables = require('../utils/constants/envVariables');
 const {
   create,
   updateOne,
@@ -13,9 +13,9 @@ const {
   findAll,
   generatePagination,
   findPopulate,
-} = require("../services/serviceLayer");
-const { verify } = require("../services/jwt");
-const categoryValidation = require("../validations/CategoryValidations");
+} = require('../services/serviceLayer');
+const { verify } = require('../services/jwt');
+const categoryValidation = require('../validations/CategoryValidations');
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -65,11 +65,11 @@ module.exports = {
 
       const isValidate = productValidation.productValidate.validate(req.body);
       if (!isValidate.error) {
-        const productData = await create("Product", products);
+        const productData = await create('Product', products);
         if (productData && Object.keys(productData).length > 0) {
           product_details.product_id = productData.id;
 
-          await create("Product_Details", product_details);
+          await create('Product_Details', product_details);
 
           if (image && selectedImage) {
             for (let item of image) {
@@ -80,7 +80,7 @@ module.exports = {
               } else {
                 obj.image = item;
               }
-              await create("Product_Image", obj);
+              await create('Product_Image', obj);
             }
           }
 
@@ -167,7 +167,7 @@ module.exports = {
 
       if (!idValidate.error && !isValidate.error) {
         const productData = await updateOne(
-          "Product",
+          'Product',
           { id: product_id },
           products
         );
@@ -178,7 +178,7 @@ module.exports = {
             
             if (item === selectedImage) {
               await updateOne(
-                "Product_Image",
+                'Product_Image',
                 { product_id },
                 { status: false }
               );
@@ -188,10 +188,10 @@ module.exports = {
             } else {
               obj.image = item;
             }
-            await create("Product_Image", obj);
+            await create('Product_Image', obj);
           }
         } else if (selectedImage) {
-          const data = await findAll("Product_Image", {
+          const data = await findAll('Product_Image', {
             product_id,
             status: true,
           });
@@ -199,7 +199,7 @@ module.exports = {
           if (data.image !== selectedImage) {
             for (const record of data) {
               await updateOne(
-                "Product_Image",
+                'Product_Image',
                 { id: record.id },
                 { status: false }
               );
@@ -207,7 +207,7 @@ module.exports = {
           }
 
           await updateOne(
-            "Product_Image",
+            'Product_Image',
             { image: selectedImage },
             { status: true }
           );
@@ -215,12 +215,12 @@ module.exports = {
           for (let item of image) {
             let obj = { product_id };
             obj.image = item;
-            await create("Product_Image", obj);
+            await create('Product_Image', obj);
           }
         }
 
         if (productData && productData.length > 0) {
-          await updateOne("Product_Details", { product_id }, product_details);
+          await updateOne('Product_Details', { product_id }, product_details);
           return res.ok(
             undefined,
             messages.UPDATE_PRODUCT_SUCCESS,
@@ -256,7 +256,7 @@ module.exports = {
         req.body
       );
       if (!idValidate.error && !isValidate.error) {
-        const data = await updateOne("Product", req.params, req.body);
+        const data = await updateOne('Product', req.params, req.body);
         if (data && data.length > 0) {
           return res.ok(
             undefined,
@@ -351,7 +351,7 @@ module.exports = {
                 id = decodedToken.id;
               }
 
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: req.params.product_id, user_id: id }],
               });
 
@@ -440,7 +440,7 @@ module.exports = {
             let productDetails = [];
 
             for (let item of rawResult.rows) {
-              const productData = await findOne("Product_Details", {
+              const productData = await findOne('Product_Details', {
                 product_id: item.product_id,
               });
               if (productData && Object.keys(productData).length > 0) {
@@ -479,7 +479,7 @@ module.exports = {
             }
 
             for (let item of result) {
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: item.product_id, user_id: id }],
               });
 
@@ -490,8 +490,8 @@ module.exports = {
               }
             }
 
-            let product = await findPopulate("Product_Image", undefined, [
-              "product_id",
+            let product = await findPopulate('Product_Image', undefined, [
+              'product_id',
             ]);
             let uniqueProductIds = {};
             let filteredArray = product.filter((item) => {
@@ -616,7 +616,7 @@ module.exports = {
             let productDetails = [];
 
             for (let item of rawResult.rows) {
-              const productData = await findOne("Product_Details", {
+              const productData = await findOne('Product_Details', {
                 product_id: item.product_id,
               });
               if (productData && Object.keys(productData).length > 0) {
@@ -657,7 +657,7 @@ module.exports = {
             let productCount;
 
             for (let item of result) {
-              const wishList = await findOne("Wishlist", {
+              const wishList = await findOne('Wishlist', {
                 and: [{ product_id: item.product_id, user_id: id }],
               });
 
@@ -672,8 +672,8 @@ module.exports = {
               delete item.product_count;
             }
 
-            let product = await findPopulate("Product_Image", undefined, [
-              "product_id",
+            let product = await findPopulate('Product_Image', undefined, [
+              'product_id',
             ]);
             let uniqueProductIds = {};
             let filteredArray = product.filter((item) => {
@@ -724,7 +724,7 @@ module.exports = {
       );
       if (!isValidation.error) {
         req
-          .file("image")
+          .file('image')
           .upload({ dirname: envVariables.path }, async (err, uploadFile) => {
             if (err) {
               return res.serverError(
@@ -776,7 +776,7 @@ module.exports = {
         req.params
       );
       if (!isValidation.error) {
-        const deleteProductImage = await deleteOne("Product_Image", req.params);
+        const deleteProductImage = await deleteOne('Product_Image', req.params);
         if (deleteProductImage && deleteProductImage.length > 0) {
           return res.ok(
             undefined,
@@ -812,12 +812,12 @@ module.exports = {
 
       if (!isRequest.error) {
         const { product_id } = req.body;
-        const findProduct = await findOne("Product", { id: product_id });
+        const findProduct = await findOne('Product', { id: product_id });
 
         if (findProduct && Object.keys(findProduct).length > 0) {
           const updatedCount = findProduct.productCount + 1;
           const productData = await updateOne(
-            "Product",
+            'Product',
             { id: product_id },
             { productCount: updatedCount }
           );
