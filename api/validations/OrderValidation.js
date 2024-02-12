@@ -55,4 +55,22 @@ module.exports = {
       'any.required' : `Flag is a Required`,
     }), 
   }),
+
+  listOforder: Joi.object().keys({
+    id: Joi.number().optional().allow(null,'').messages({
+      'number.base'  : `Id should be a type of number`,
+      'number.empty' : `Id cannot be an empty field`,
+      'any.required' : `Id is a Required`,
+    }), 
+    user_id: Joi.number().optional().allow(null,'').messages({
+      'number.base'  : `User id should be a type of number`,
+      'number.empty' : `User id cannot be an empty field`,
+      'any.required' : `User id is a Required`,
+    }),
+    flag: Joi.number().optional().allow(null,'').messages({
+      'number.base'  : `Flag should be a type of number`,
+      'number.empty' : `Flag cannot be an empty field`,
+      'any.required' : `Flag is a Required`,
+    }),
+  }),
 };

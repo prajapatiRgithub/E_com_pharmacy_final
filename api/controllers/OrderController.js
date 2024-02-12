@@ -416,4 +416,73 @@ module.exports = {
       );
     }
   },
+
+  listOfOrder: async (req, res) => {
+    try {
+      const isValidation = orderValidation.listOforder.validate(req.body);
+
+      const {id, flag, user_id} = req.body;
+     
+      if (!isValidation.error) {
+        let order_status;
+        switch (flag) {
+          case 0:
+            order_status = response.OrderEnum.Failed;
+            break;
+          case 1:
+            order_status = response.OrderEnum.Success;
+            break;
+          case 3:
+            order_status = response.OrderEnum.Confirmed;
+            break;
+          case 4:
+            order_status = response.OrderEnum.Approve;
+            break;
+          case 5:
+            order_status = response.OrderEnum.Processing;
+            break;
+          case 6:
+            order_status = response.OrderEnum.Rejected;
+            break;
+          case 2:
+            order_status = true;
+            break;
+          default:
+            order_status = response.OrderEnum.Pending;
+        }
+
+        const condition = flag === 2 && user_id ? {is_archived: order_status, user_id} : flag !== 2 && user_id ? {status: order_status, user_id} : id ? { id } : flag === 2 ? {is_archived: order_status} : flag !== 2 ? {status: order_status} : {}
+
+        const viewData = await findAll(
+          'Order',
+          condition,
+        );
+        if (viewData && viewData.length > 0) {
+          return res.ok(
+            viewData,
+            undefined,
+            response.RESPONSE_STATUS.success
+          );
+        } else {
+          return res.ok(
+            undefined,
+            messages.ID_NOT_FOUND,
+            response.RESPONSE_STATUS.error
+          );
+        }
+      } else {
+        return res.badRequest(
+          isValidation.error,
+          undefined,
+          response.RESPONSE_STATUS.error
+        );
+      }
+    } catch (err) {
+      return res.serverError(
+        err,
+        `${messages.REQUEST_FAILURE} view order.`,
+        response.RESPONSE_STATUS.error
+      );
+    }
+  },
 };

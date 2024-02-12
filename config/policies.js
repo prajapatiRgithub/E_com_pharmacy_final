@@ -119,5 +119,6 @@ module.exports.policies = {
     orderHistory : ['isLoggedIn', 'commonAdministrator'],
     orderStatus  : ['isLoggedIn', 'commonAdministrator'],
     viewOrder    : ['isLoggedIn', 'commonAdministrator'],
+    listOfOrder  : ['isLoggedIn', 'commonAdministrator'],
   }
 };

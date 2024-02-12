@@ -112,7 +112,8 @@
   'PUT /api/order/cancelOrder'                         : 'OrderController.cancelOrder',
   'GET /api/order/orderHistory/:user_id'               : 'OrderController.orderHistory',
   'PUT /api/order/orderStatus'                         : 'OrderController.orderStatus',
-  'GET /api/order/viewOrder/:order_id'                 : 'OrderController.viewOrder'
+  'GET /api/order/viewOrder/:order_id'                 : 'OrderController.viewOrder',
+  'POST /api/order/listOfOrder'                        : 'OrderController.listOfOrder'
 
   /***************************************************************************
                                                                             
