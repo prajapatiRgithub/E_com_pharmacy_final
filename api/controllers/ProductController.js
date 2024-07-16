@@ -437,16 +437,17 @@ module.exports = {
             );
           }
           if (rawResult.rows && rawResult.rows.length > 0) {
-            let productDetails = [];
+            let productDetails = await Promise.all(
+              rawResult.rows.map(async (item) => {
+                const productData = await findOne('Product_Details', {
+                  product_id: item.product_id,
+                });
 
-            for (let item of rawResult.rows) {
-              const productData = await findOne('Product_Details', {
-                product_id: item.product_id,
-              });
-              if (productData && Object.keys(productData).length > 0) {
-                productDetails.push(productData);
-              }
-            }
+                if (productData && Object.keys(productData).length > 0) {
+                  return productData;
+                }
+              })
+            );
 
             let result = [];
             let values = {};
@@ -478,17 +479,20 @@ module.exports = {
               id = decodedToken.id;
             }
 
-            for (let item of result) {
-              const wishList = await findOne('Wishlist', {
-                and: [{ product_id: item.product_id, user_id: id }],
-              });
+            const result1 = await Promise.all(
+              result.map(async (item) => {
+                const wishList = await findOne('Wishlist', {
+                  and: [{ product_id: item.product_id, user_id: id }],
+                });
 
-              if (wishList && Object.keys(wishList).length > 0) {
-                item.flag = 1;
-              } else {
-                item.flag = 0;
-              }
-            }
+                if (wishList && Object.keys(wishList).length > 0) {
+                  item.flag = 1;
+                } else {
+                  item.flag = 0;
+                }
+                return item;
+              })
+            );
 
             let product = await findPopulate('Product_Image', undefined, [
               'product_id',
@@ -506,7 +510,7 @@ module.exports = {
             });
 
             let obj = {
-              item: result,
+              item: result1,
               count: filteredArray.length,
             };
             return res.ok(obj, undefined, response.RESPONSE_STATUS.success);
